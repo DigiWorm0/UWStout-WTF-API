@@ -64,8 +64,22 @@ export default class UserDB {
     }
 
     async searchUsers(query: string, limit: number) {
+        const names = query.split(" ");
         return await this._userModel.findAll({
-            where: {
+            where: names.length > 1 ? {
+                [Op.and]: [
+                    {
+                        firstName: {
+                            [Op.like]: `%${names[0]}%`,
+                        },
+                    },
+                    {
+                        lastName: {
+                            [Op.like]: `%${names[1]}%`,
+                        },
+                    },
+                ],
+            } : {
                 [Op.or]: [
                     {
                         firstName: {
