@@ -34,7 +34,8 @@ export default class DBContainer {
     }
 
     async updateAll() {
-        await this.updateEvents(0);
+        await this.updateEvents(0, true);
+        await this.updateEvents(0, false);
         await this.updateUsers(0);
         await this._updateUserPointPos();
     }
@@ -69,12 +70,12 @@ export default class DBContainer {
     /*
         Events
     */
-    async updateEvents(page: number) {
-        const events = await this._scraper.getEvents(page * EVENTS_SIZE, EVENTS_SIZE);
+    async updateEvents(page: number, isPast: boolean) {
+        const events = await this._scraper.getEvents(page * EVENTS_SIZE, EVENTS_SIZE, isPast);
         console.log(Color.yellow(`Updating ${events.length} events from page ${page}...`));
         await this._eventDB.updateEvents(events);
         if (events.length > 0) {
-            await this.updateEvents(page + 1);
+            await this.updateEvents(page + 1, isPast);
         }
     }
     async getRecentEvents(offset: number = 0, limit: number = EVENTS_SIZE) {

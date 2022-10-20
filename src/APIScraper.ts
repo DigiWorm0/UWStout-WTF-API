@@ -75,7 +75,7 @@ export default class APIScraper {
         }
     }
 
-    async getEvents(offset: number, limit: number): Promise<Event[]> {
+    async getEvents(offset: number, limit: number, isPast: boolean): Promise<Event[]> {
         if (!this._cookies) {
             await this.authenticate();
         }
@@ -83,7 +83,8 @@ export default class APIScraper {
             const response = await axios.get(EVENT_API_URL, {
                 params: {
                     range: offset,
-                    limit
+                    limit,
+                    filter1: isPast ? "past" : undefined
                 },
                 headers: {
                     cookie: this._cookies.map((cookie: any) => `${cookie.name}=${cookie.value}`).join("; ")
@@ -108,7 +109,7 @@ export default class APIScraper {
             console.log(Color.red("Re-authenticating again in 5 seconds..."));
             await new Promise(resolve => setTimeout(resolve, 5000));
             this._cookies = undefined;
-            return this.getEvents(offset, limit);
+            return this.getEvents(offset, limit, isPast);
         }
     }
 
