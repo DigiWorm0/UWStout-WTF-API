@@ -21,20 +21,26 @@ export default class DBContainer {
 
         Promise.all([userInit, eventInit]).then(() => {
             const shouldUpdate = process.argv.includes("--update");
+            const shouldUpdatePast = process.argv.includes("--update-past");
             const shouldAuth = process.argv.includes("--auth");
             const shouldUpdatePoints = process.argv.includes("--update-points");
+            if (shouldUpdatePast)
+                this.updateAllPast();
             if (shouldUpdate)
-                this.updateAll();
+                this.updateAllFuture();
             else if (shouldAuth)
                 this._scraper.authenticate();
             else if (shouldUpdatePoints)
                 this._updateUserPointPos();
-            setInterval(() => this.updateAll(), 1000 * 60 * 60 * 24);
+            setInterval(() => this.updateAllFuture(), 1000 * 60 * 60 * 24);
         });
     }
 
-    async updateAll() {
+    async updateAllPast() {
         await this.updateEvents(0, true);
+    }
+
+    async updateAllFuture() {
         await this.updateEvents(0, false);
         await this.updateUsers(0);
         await this._updateUserPointPos();
